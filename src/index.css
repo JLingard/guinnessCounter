@@ -1,0 +1,68 @@
+@font-face {
+  font-family: 'Copperplate';
+  src: url('/Copperplate.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --color-black: #0a0a0a;
+  --color-stout: #1a1a1a;
+  --color-cream: #f5e6c8;
+  --color-gold: #c9a227;
+  --color-white: #ffffff;
+  --color-error: #c0392b;
+  
+  --font-main: 'Copperplate', 'Copperplate Gothic', 'Copperplate Gothic Bold', serif;
+  
+  --tap-target-min: 48px;
+  --transition-fast: 100ms;
+  --transition-medium: 200ms;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--color-black);
+  color: var(--color-cream);
+  min-height: 100dvh;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input {
+  font-family: inherit;
+}
+
+@media screen and (max-width: 768px) {
+  input[type="text"] {
+    font-size: 16px;
+  }
+}
