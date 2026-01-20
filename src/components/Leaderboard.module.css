@@ -56,7 +56,6 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--color-cream);
-  overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
