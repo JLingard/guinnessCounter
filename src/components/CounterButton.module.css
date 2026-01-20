@@ -145,3 +145,30 @@
   color: var(--color-cream);
   opacity: 0.4;
 }
+
+.leaderboardButton {
+  position: fixed;
+  bottom: max(1.5rem, env(safe-area-inset-bottom));
+  right: 1.5rem;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--color-stout);
+  border: 2px solid var(--color-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.5rem;
+  transition: transform var(--transition-fast) ease,
+              background-color var(--transition-fast) ease;
+  z-index: 100;
+}
+
+.leaderboardButton:hover {
+  background: rgba(201, 162, 39, 0.2);
+}
+
+.leaderboardButton:active {
+  transform: scale(0.95);
+}

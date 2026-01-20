@@ -1,4 +1,4 @@
-# Tap Counter
+# Guinness Counter
 
 A mobile-first React application for logging repeated tap events. Designed for one-handed use with optimistic UI updates and graceful error handling.
 

@@ -5,5 +5,6 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   // For GitHub Pages deployment, set base to your repo name
-  // base: '/your-repo-name/',
+  // Replace 'guinnessCounter' with your actual GitHub repo name
+  base: '/guinnessCounter/',
 })

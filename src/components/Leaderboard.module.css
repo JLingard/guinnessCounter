@@ -1,0 +1,119 @@
+.container {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: calc(env(safe-area-inset-top) + 2rem) 1rem calc(env(safe-area-inset-bottom) + 2rem);
+  background-color: var(--color-black);
+  position: relative;
+}
+
+.title {
+  font-size: clamp(1.5rem, 6vw, 2.5rem);
+  font-weight: normal;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.list {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.entry {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: var(--color-stout);
+  border: 1px solid rgba(201, 162, 39, 0.2);
+  transition: background-color var(--transition-fast) ease;
+}
+
+.entry.currentUser {
+  background: rgba(201, 162, 39, 0.15);
+  border-color: var(--color-gold);
+}
+
+.rank {
+  font-size: 1.25rem;
+  min-width: 2rem;
+  text-align: center;
+  color: var(--color-cream);
+}
+
+.name {
+  flex: 1;
+  font-size: 1rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-cream);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.count {
+  font-size: 1.25rem;
+  font-weight: normal;
+  color: var(--color-gold);
+  min-width: 3rem;
+  text-align: right;
+}
+
+.loading,
+.error,
+.empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--color-cream);
+  opacity: 0.6;
+  font-size: 1rem;
+  letter-spacing: 0.1em;
+}
+
+.error {
+  color: var(--color-error);
+  opacity: 1;
+}
+
+.backButton {
+  position: fixed;
+  bottom: max(1.5rem, env(safe-area-inset-bottom));
+  right: 1.5rem;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--color-stout);
+  border: 2px solid var(--color-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform var(--transition-fast) ease,
+              background-color var(--transition-fast) ease;
+  z-index: 100;
+}
+
+.backButton:hover {
+  background: rgba(201, 162, 39, 0.2);
+}
+
+.backButton:active {
+  transform: scale(0.95);
+}
+
+.backIcon {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
