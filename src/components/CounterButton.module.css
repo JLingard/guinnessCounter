@@ -21,6 +21,11 @@
   padding: 1rem;
   transition: transform var(--transition-fast) ease,
               filter var(--transition-fast) ease;
+  /* Prevent mobile context menu */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
 }
 
 .button:active:not(:disabled) {
@@ -73,6 +78,8 @@
   object-fit: contain;
   user-select: none;
   -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+  pointer-events: none;
 }
 
 .countOverlay {

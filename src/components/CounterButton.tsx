@@ -117,7 +117,11 @@ function CounterButton({ userName, onLeaderboard }: CounterButtonProps) {
     }
   }, [isSubmitting, isLoading, count, userName, showFeedback])
 
-  const handlePressStart = useCallback(() => {
+  const handlePressStart = useCallback((e: React.TouchEvent | React.MouseEvent) => {
+    // Prevent default to stop context menu on mobile
+    if ('touches' in e) {
+      e.preventDefault()
+    }
     isLongPressRef.current = false
     longPressTimerRef.current = window.setTimeout(() => {
       isLongPressRef.current = true
@@ -130,6 +134,10 @@ function CounterButton({ userName, onLeaderboard }: CounterButtonProps) {
       clearTimeout(longPressTimerRef.current)
       longPressTimerRef.current = null
     }
+  }, [])
+
+  const handleContextMenu = useCallback((e: React.MouseEvent) => {
+    e.preventDefault() // Prevent right-click/long-press context menu
   }, [])
 
   const handleClick = useCallback(() => {
@@ -159,6 +167,7 @@ function CounterButton({ userName, onLeaderboard }: CounterButtonProps) {
         onTouchStart={handlePressStart}
         onTouchEnd={handlePressEnd}
         onTouchCancel={handlePressEnd}
+        onContextMenu={handleContextMenu}
         disabled={isSubmitting || isLoading}
         className={buttonClasses}
         aria-label={`Tap for ${userName}. Current count: ${count ?? 0}. Hold to remove.`}
