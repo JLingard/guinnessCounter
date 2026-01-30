@@ -15,12 +15,14 @@ type FeedbackState = 'idle' | 'success' | 'error' | 'decrement'
 
 const LONG_PRESS_DURATION = 600 // ms
 const HALF_PINT_STORAGE_KEY = 'guinness-half-pint-mode'
+const DRINK_ANIMATION_DURATION = 600 // ms
 
 function CounterButton({ userName, onLeaderboard, onStats, onRules }: CounterButtonProps) {
   const [count, setCount] = useState<number | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [hasApiError, setHasApiError] = useState(false)
+  const [isDrinking, setIsDrinking] = useState(false)
   const [isHalfPint, setIsHalfPint] = useState(() => {
     return localStorage.getItem(HALF_PINT_STORAGE_KEY) === 'true'
   })
@@ -29,6 +31,8 @@ function CounterButton({ userName, onLeaderboard, onStats, onRules }: CounterBut
   const feedbackTimeoutRef = useRef<number | null>(null)
   const longPressTimerRef = useRef<number | null>(null)
   const isLongPressRef = useRef(false)
+  const apiCompleteRef = useRef(false)
+  const animationCompleteRef = useRef(false)
 
   const toggleHalfPint = useCallback(() => {
     setIsHalfPint(prev => {
@@ -86,13 +90,31 @@ function CounterButton({ userName, onLeaderboard, onStats, onRules }: CounterBut
     }
   }, [clearFeedbackTimeout])
 
+  const finishDrinking = useCallback(() => {
+    if (apiCompleteRef.current && animationCompleteRef.current) {
+      setIsDrinking(false)
+      setIsSubmitting(false)
+      apiCompleteRef.current = false
+      animationCompleteRef.current = false
+    }
+  }, [])
+
   const handleIncrement = useCallback(async () => {
-    if (isSubmitting || isLoading) return
+    if (isSubmitting || isLoading || isDrinking) return
     
     const amount = isHalfPint ? 0.5 : 1
     setCount((prev) => (prev ?? 0) + amount)
     setIsSubmitting(true)
+    setIsDrinking(true)
     setErrorMessage(null)
+    apiCompleteRef.current = false
+    animationCompleteRef.current = false
+    
+    // Start animation timer
+    setTimeout(() => {
+      animationCompleteRef.current = true
+      finishDrinking()
+    }, DRINK_ANIMATION_DURATION)
     
     try {
       await fetch(API_ENDPOINT, {
@@ -103,16 +125,21 @@ function CounterButton({ userName, onLeaderboard, onStats, onRules }: CounterBut
         },
         body: JSON.stringify({ name: userName, amount }),
       })
+      apiCompleteRef.current = true
       showFeedback('success')
+      finishDrinking()
     } catch (error) {
       setCount((prev) => Math.max(0, (prev ?? amount) - amount))
       const message = error instanceof Error ? error.message : 'Something went wrong'
       setErrorMessage(message)
       showFeedback('error', 3000)
-    } finally {
+      // On error, stop drinking animation immediately
+      setIsDrinking(false)
       setIsSubmitting(false)
+      apiCompleteRef.current = false
+      animationCompleteRef.current = false
     }
-  }, [isSubmitting, isLoading, isHalfPint, userName, showFeedback])
+  }, [isSubmitting, isLoading, isDrinking, isHalfPint, userName, showFeedback, finishDrinking])
 
   const handleDecrement = useCallback(async () => {
     if (isSubmitting || isLoading || (count ?? 0) <= 0) return
@@ -185,6 +212,7 @@ function CounterButton({ userName, onLeaderboard, onStats, onRules }: CounterBut
     feedback === 'error' ? styles.error : '',
     feedback === 'decrement' ? styles.decrement : '',
     isHalfPint ? styles.halfPint : '',
+    isDrinking ? styles.drinking : '',
   ].filter(Boolean).join(' ')
 
   if (hasApiError) {
@@ -222,12 +250,22 @@ function CounterButton({ userName, onLeaderboard, onStats, onRules }: CounterBut
         aria-label={`Tap for ${userName}. Current count: ${count ?? 0}. Hold to remove.`}
         aria-live="polite"
       >
-        <img 
-          src={`${import.meta.env.BASE_URL}guinness.png`}
-          alt="" 
-          className={styles.pintImage}
-          draggable={false}
-        />
+        <div className={styles.pintContainer}>
+          {/* Empty glass (shown behind during animation) */}
+          <img 
+            src={`${import.meta.env.BASE_URL}GuinnessEmpty.png`}
+            alt="" 
+            className={styles.pintImageEmpty}
+            draggable={false}
+          />
+          {/* Full glass (clips away during animation) */}
+          <img 
+            src={`${import.meta.env.BASE_URL}guinness.png`}
+            alt="" 
+            className={styles.pintImage}
+            draggable={false}
+          />
+        </div>
         
         <div className={styles.countOverlay}>
           <span className={styles.countValue}>

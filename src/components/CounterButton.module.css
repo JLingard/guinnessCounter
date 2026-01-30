@@ -70,7 +70,20 @@
   100% { transform: scale(1); }
 }
 
-.pintImage {
+/* Pint glass container for animation */
+.pintContainer {
+  position: relative;
+  width: auto;
+  height: 100%;
+  max-height: 80dvh;
+  max-width: 90vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pintImage,
+.pintImageEmpty {
   width: auto;
   height: 100%;
   max-height: 80dvh;
@@ -80,6 +93,31 @@
   -webkit-user-drag: none;
   -webkit-touch-callout: none;
   pointer-events: none;
+}
+
+.pintImage {
+  position: relative;
+  z-index: 2;
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 0.6s ease-in-out;
+}
+
+.pintImageEmpty {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+}
+
+/* Drinking animation - clip the full glass from top to bottom (emptying) */
+.button.drinking .pintImage {
+  clip-path: inset(100% 0 0 0);
+}
+
+/* Refill animation when drinking completes */
+.button:not(.drinking) .pintImage {
+  clip-path: inset(0 0 0 0);
 }
 
 .countOverlay {
@@ -92,6 +130,7 @@
   align-items: center;
   justify-content: center;
   pointer-events: none;
+  z-index: 10;
 }
 
 .countValue {
@@ -204,7 +243,7 @@
 }
 
 /* Half pint mode */
-.button.halfPint .pintImage {
+.button.halfPint .pintContainer {
   transform: scale(0.8);
 }
 
