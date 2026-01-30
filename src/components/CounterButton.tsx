@@ -1,27 +1,42 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faTrophy, faChartSimple, faCircleInfo, faBeer } from '@fortawesome/free-solid-svg-icons'
 import styles from './CounterButton.module.css'
+import { API_ENDPOINT } from '../config'
 
 interface CounterButtonProps {
   userName: string
   onLeaderboard: () => void
+  onStats: () => void
+  onRules: () => void
 }
 
 type FeedbackState = 'idle' | 'success' | 'error' | 'decrement'
 
-const API_ENDPOINT = import.meta.env.VITE_API_ENDPOINT || 
-  'https://script.google.com/macros/s/AKfycbwH5BCG_w_Ykohl8JchB9ei6IccC0CVu2Q-QB8sKCH8HpB-l1IYv0wHmeaia7cBgimV/exec'
-
 const LONG_PRESS_DURATION = 600 // ms
+const HALF_PINT_STORAGE_KEY = 'guinness-half-pint-mode'
 
-function CounterButton({ userName, onLeaderboard }: CounterButtonProps) {
+function CounterButton({ userName, onLeaderboard, onStats, onRules }: CounterButtonProps) {
   const [count, setCount] = useState<number | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [hasApiError, setHasApiError] = useState(false)
+  const [isHalfPint, setIsHalfPint] = useState(() => {
+    return localStorage.getItem(HALF_PINT_STORAGE_KEY) === 'true'
+  })
   const [feedback, setFeedback] = useState<FeedbackState>('idle')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const feedbackTimeoutRef = useRef<number | null>(null)
   const longPressTimerRef = useRef<number | null>(null)
   const isLongPressRef = useRef(false)
+
+  const toggleHalfPint = useCallback(() => {
+    setIsHalfPint(prev => {
+      const newValue = !prev
+      localStorage.setItem(HALF_PINT_STORAGE_KEY, String(newValue))
+      return newValue
+    })
+  }, [])
 
   // Fetch initial count from Google Sheets on mount
   useEffect(() => {
@@ -30,10 +45,18 @@ function CounterButton({ userName, onLeaderboard }: CounterButtonProps) {
         const response = await fetch(
           `${API_ENDPOINT}?action=getCount&name=${encodeURIComponent(userName)}`
         )
+        if (!response.ok) {
+          setHasApiError(true)
+          return
+        }
         const data = await response.json()
+        if (data.error) {
+          setHasApiError(true)
+          return
+        }
         setCount(data.count ?? 0)
       } catch {
-        setCount(0)
+        setHasApiError(true)
       } finally {
         setIsLoading(false)
       }
@@ -66,7 +89,8 @@ function CounterButton({ userName, onLeaderboard }: CounterButtonProps) {
   const handleIncrement = useCallback(async () => {
     if (isSubmitting || isLoading) return
     
-    setCount((prev) => (prev ?? 0) + 1)
+    const amount = isHalfPint ? 0.5 : 1
+    setCount((prev) => (prev ?? 0) + amount)
     setIsSubmitting(true)
     setErrorMessage(null)
     
@@ -77,23 +101,24 @@ function CounterButton({ userName, onLeaderboard }: CounterButtonProps) {
         headers: {
           'Content-Type': 'text/plain',
         },
-        body: JSON.stringify({ name: userName }),
+        body: JSON.stringify({ name: userName, amount }),
       })
       showFeedback('success')
     } catch (error) {
-      setCount((prev) => Math.max(0, (prev ?? 1) - 1))
+      setCount((prev) => Math.max(0, (prev ?? amount) - amount))
       const message = error instanceof Error ? error.message : 'Something went wrong'
       setErrorMessage(message)
       showFeedback('error', 3000)
     } finally {
       setIsSubmitting(false)
     }
-  }, [isSubmitting, isLoading, userName, showFeedback])
+  }, [isSubmitting, isLoading, isHalfPint, userName, showFeedback])
 
   const handleDecrement = useCallback(async () => {
     if (isSubmitting || isLoading || (count ?? 0) <= 0) return
     
-    setCount((prev) => Math.max(0, (prev ?? 1) - 1))
+    // We don't know the amount of the last entry, so we'll let the API handle it
+    // and just re-fetch the count after
     setIsSubmitting(true)
     setErrorMessage(null)
     
@@ -106,9 +131,14 @@ function CounterButton({ userName, onLeaderboard }: CounterButtonProps) {
         },
         body: JSON.stringify({ name: userName, action: 'deleteLastEntry' }),
       })
+      // Re-fetch count since we don't know how much was removed
+      const response = await fetch(
+        `${API_ENDPOINT}?action=getCount&name=${encodeURIComponent(userName)}`
+      )
+      const data = await response.json()
+      setCount(data.count ?? 0)
       showFeedback('decrement')
     } catch (error) {
-      setCount((prev) => (prev ?? 0) + 1) // Revert on error
       const message = error instanceof Error ? error.message : 'Something went wrong'
       setErrorMessage(message)
       showFeedback('error', 3000)
@@ -154,7 +184,26 @@ function CounterButton({ userName, onLeaderboard }: CounterButtonProps) {
     feedback === 'success' ? styles.success : '',
     feedback === 'error' ? styles.error : '',
     feedback === 'decrement' ? styles.decrement : '',
+    isHalfPint ? styles.halfPint : '',
   ].filter(Boolean).join(' ')
+
+  if (hasApiError) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.apiError}>
+          <span className={styles.apiErrorEmoji}>😬</span>
+          <h2 className={styles.apiErrorTitle}>Oops!</h2>
+          <p className={styles.apiErrorMessage}>
+            Sorry, looks like I've broken the app.
+          </p>
+          <p className={styles.apiErrorHint}>
+            Let me know if you see this!
+          </p>
+        </div>
+        <div className={styles.userName}>{userName}</div>
+      </div>
+    )
+  }
 
   return (
     <div className={styles.container}>
@@ -196,13 +245,39 @@ function CounterButton({ userName, onLeaderboard }: CounterButtonProps) {
         </div>
       )}
 
-      <button 
-        className={styles.leaderboardButton}
-        onClick={onLeaderboard}
-        aria-label="View leaderboard"
-      >
-        🏆
-      </button>
+      <div className={styles.buttonBar}>
+        <button 
+          className={styles.navButton}
+          onClick={onStats}
+          aria-label="View your stats"
+        >
+          <FontAwesomeIcon icon={faChartSimple} />
+        </button>
+
+        <button 
+          className={`${styles.navButton} ${styles.pintToggle} ${isHalfPint ? styles.active : ''}`}
+          onClick={toggleHalfPint}
+          aria-label={isHalfPint ? "Switch to full pint" : "Switch to half pint"}
+        >
+          <FontAwesomeIcon icon={faBeer} className={isHalfPint ? styles.halfPintIcon : styles.fullPintIcon} />
+        </button>
+
+        <button 
+          className={styles.navButton}
+          onClick={onRules}
+          aria-label="View rules"
+        >
+          <FontAwesomeIcon icon={faCircleInfo} />
+        </button>
+
+        <button 
+          className={styles.navButton}
+          onClick={onLeaderboard}
+          aria-label="View leaderboard"
+        >
+          <FontAwesomeIcon icon={faTrophy} />
+        </button>
+      </div>
     </div>
   )
 }

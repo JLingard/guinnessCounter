@@ -2,15 +2,18 @@ import { useState, useEffect } from 'react'
 import NameEntry from './components/NameEntry'
 import CounterButton from './components/CounterButton'
 import Leaderboard from './components/Leaderboard'
+import UserStats from './components/UserStats'
+import RulesModal from './components/RulesModal'
 
 const STORAGE_KEY = 'tap-counter-user-name'
 
-type Screen = 'counter' | 'leaderboard'
+type Screen = 'counter' | 'leaderboard' | 'stats'
 
 function App() {
   const [userName, setUserName] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [currentScreen, setCurrentScreen] = useState<Screen>('counter')
+  const [showRules, setShowRules] = useState(false)
 
   useEffect(() => {
     const storedName = localStorage.getItem(STORAGE_KEY)
@@ -40,11 +43,25 @@ function App() {
     )
   }
 
+  if (currentScreen === 'stats') {
+    return (
+      <UserStats 
+        userName={userName}
+        onBack={() => setCurrentScreen('counter')} 
+      />
+    )
+  }
+
   return (
-    <CounterButton 
-      userName={userName} 
-      onLeaderboard={() => setCurrentScreen('leaderboard')}
-    />
+    <>
+      <CounterButton 
+        userName={userName} 
+        onLeaderboard={() => setCurrentScreen('leaderboard')}
+        onStats={() => setCurrentScreen('stats')}
+        onRules={() => setShowRules(true)}
+      />
+      {showRules && <RulesModal onClose={() => setShowRules(false)} />}
+    </>
   )
 }
 

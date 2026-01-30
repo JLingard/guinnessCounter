@@ -97,6 +97,8 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  font-size: 1.5rem;
+  color: var(--color-gold);
   transition: transform var(--transition-fast) ease,
               background-color var(--transition-fast) ease;
   z-index: 100;
@@ -108,11 +110,5 @@
 
 .backButton:active {
   transform: scale(0.95);
-}
-
-.backIcon {
-  width: 32px;
-  height: 32px;
-  object-fit: contain;
 }
 

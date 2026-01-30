@@ -1,0 +1,120 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+  animation: fadeIn 200ms ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal {
+  background: var(--color-stout);
+  border: 2px solid var(--color-gold);
+  padding: 2rem;
+  max-width: 400px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  animation: slideUp 300ms ease;
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+.closeButton {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid rgba(201, 162, 39, 0.3);
+  color: var(--color-cream);
+  font-size: 1.25rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast) ease;
+}
+
+.closeButton:hover {
+  background: rgba(201, 162, 39, 0.2);
+  border-color: var(--color-gold);
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: normal;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.rules {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.rule {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.ruleIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  width: 2.5rem;
+  text-align: center;
+  color: var(--color-gold);
+}
+
+.ruleIcon.halfPintIcon {
+  font-size: 1rem;
+}
+
+.ruleContent h3 {
+  font-size: 1rem;
+  font-weight: normal;
+  color: var(--color-cream);
+  margin-bottom: 0.25rem;
+  letter-spacing: 0.05em;
+}
+
+.ruleContent p {
+  font-size: 0.875rem;
+  color: var(--color-cream);
+  opacity: 0.7;
+  line-height: 1.4;
+}
+
+.footer {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--color-cream);
+  opacity: 0.6;
+}
+

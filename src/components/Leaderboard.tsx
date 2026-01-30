@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faBeer } from '@fortawesome/free-solid-svg-icons'
 import styles from './Leaderboard.module.css'
+import { API_ENDPOINT } from '../config'
 
 interface LeaderboardEntry {
   name: string
@@ -10,9 +13,6 @@ interface LeaderboardProps {
   onBack: () => void
   currentUser: string
 }
-
-const API_ENDPOINT = import.meta.env.VITE_API_ENDPOINT || 
-  'https://script.google.com/macros/s/AKfycbwH5BCG_w_Ykohl8JchB9ei6IccC0CVu2Q-QB8sKCH8HpB-l1IYv0wHmeaia7cBgimV/exec'
 
 function Leaderboard({ onBack, currentUser }: LeaderboardProps) {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([])
@@ -78,11 +78,7 @@ function Leaderboard({ onBack, currentUser }: LeaderboardProps) {
         onClick={onBack}
         aria-label="Back to counter"
       >
-        <img 
-          src={`${import.meta.env.BASE_URL}guinness.png`}
-          alt="Back to counter" 
-          className={styles.backIcon}
-        />
+        <FontAwesomeIcon icon={faBeer} />
       </button>
     </div>
   )

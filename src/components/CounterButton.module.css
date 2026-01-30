@@ -108,7 +108,7 @@
 
 .userName {
   position: absolute;
-  bottom: max(2rem, env(safe-area-inset-bottom));
+  bottom: calc(max(1.5rem, env(safe-area-inset-bottom)) + 70px);
   left: 50%;
   transform: translateX(-50%);
   font-size: 1rem;
@@ -163,12 +163,20 @@
   opacity: 0.4;
 }
 
-.leaderboardButton {
+/* Button Bar */
+.buttonBar {
   position: fixed;
   bottom: max(1.5rem, env(safe-area-inset-bottom));
-  right: 1.5rem;
-  width: 56px;
-  height: 56px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.75rem;
+  z-index: 100;
+}
+
+.navButton {
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   background: var(--color-stout);
   border: 2px solid var(--color-gold);
@@ -176,16 +184,78 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
+  color: var(--color-gold);
   transition: transform var(--transition-fast) ease,
               background-color var(--transition-fast) ease;
-  z-index: 100;
 }
 
-.leaderboardButton:hover {
+.navButton:hover {
   background: rgba(201, 162, 39, 0.2);
 }
 
-.leaderboardButton:active {
+.navButton:active {
   transform: scale(0.95);
+}
+
+.navButton.active {
+  background: var(--color-gold);
+  color: var(--color-black);
+}
+
+/* Half pint mode */
+.button.halfPint .pintImage {
+  transform: scale(0.8);
+}
+
+/* Pint toggle button icon sizes */
+.pintToggle {
+  font-size: 1.5rem;
+}
+
+.fullPintIcon {
+  font-size: 1.5rem;
+  transition: font-size var(--transition-fast) ease;
+}
+
+.halfPintIcon {
+  font-size: 1rem;
+  transition: font-size var(--transition-fast) ease;
+}
+
+/* API Error State */
+.apiError {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  flex: 1;
+}
+
+.apiErrorEmoji {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.apiErrorTitle {
+  font-size: 2rem;
+  color: var(--color-gold);
+  margin-bottom: 1rem;
+  font-weight: normal;
+  letter-spacing: 0.1em;
+}
+
+.apiErrorMessage {
+  font-size: 1.125rem;
+  color: var(--color-cream);
+  margin-bottom: 0.5rem;
+  max-width: 280px;
+}
+
+.apiErrorHint {
+  font-size: 0.875rem;
+  color: var(--color-cream);
+  opacity: 0.6;
 }
