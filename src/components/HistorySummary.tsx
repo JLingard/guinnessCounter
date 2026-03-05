@@ -213,7 +213,7 @@ function HistorySummary({ userName, onBack }: HistorySummaryProps) {
       </div>
 
       <button className={styles.backButton} onClick={onBack} aria-label="Back to stats">
-        <FontAwesomeIcon icon={faBeer} />
+        <FontAwesomeIcon icon={faChartLine} />
       </button>
     </div>
   )
