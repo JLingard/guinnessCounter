@@ -1,0 +1,223 @@
+.container {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: calc(env(safe-area-inset-top) + 1.5rem) 1rem calc(env(safe-area-inset-bottom) + 6rem);
+  background-color: var(--color-black);
+  overflow-y: scroll;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.title {
+  font-size: clamp(1.5rem, 6vw, 2.5rem);
+  font-weight: normal;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  margin-bottom: 0.25rem;
+  text-align: center;
+}
+
+.subtitle {
+  font-size: 0.875rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-cream);
+  opacity: 0.6;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+/* ── Sections ───────────────────────────────────────────── */
+
+.section {
+  width: 100%;
+  max-width: 500px;
+  margin-bottom: 2rem;
+}
+
+.sectionTitle {
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-cream);
+  opacity: 0.5;
+  margin-bottom: 0.75rem;
+}
+
+/* ── Bar chart ──────────────────────────────────────────── */
+
+.chartWrapper {
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  /* subtle gold fade on right edge to hint scroll */
+  mask-image: linear-gradient(to right, black 90%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, black 90%, transparent 100%);
+  padding-bottom: 0.25rem;
+}
+
+.chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  min-width: max-content;
+  padding: 2rem 0.25rem 0;
+}
+
+.barCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 40px;
+}
+
+.bar {
+  width: 100%;
+  background: var(--color-gold);
+  opacity: 0.55;
+  min-height: 4px;
+  border-radius: 2px 2px 0 0;
+  transition: height 0.4s ease;
+}
+
+.barCurrent {
+  opacity: 1;
+  background: var(--color-gold);
+  box-shadow: 0 0 8px rgba(201, 162, 39, 0.5);
+}
+
+.barCount {
+  font-size: 0.6rem;
+  color: var(--color-cream);
+  opacity: 0.8;
+  line-height: 1;
+  min-height: 0.75rem;
+}
+
+.barLabel {
+  font-size: 0.55rem;
+  letter-spacing: 0.04em;
+  color: var(--color-cream);
+  opacity: 0.5;
+  text-align: center;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+/* ── Daily log ──────────────────────────────────────────── */
+
+.dayList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.dayEntry {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.875rem 1.25rem;
+  background: var(--color-stout);
+  border: 1px solid rgba(201, 162, 39, 0.2);
+}
+
+.dayDate {
+  flex: 1;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-cream);
+}
+
+.dayCount {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 1.1rem;
+  color: var(--color-gold);
+  min-width: 2.5rem;
+  justify-content: flex-end;
+}
+
+.dayIcon {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+/* ── States ─────────────────────────────────────────────── */
+
+.loading,
+.error {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--color-cream);
+  opacity: 0.6;
+  font-size: 1rem;
+  letter-spacing: 0.1em;
+}
+
+.error {
+  color: var(--color-error);
+  opacity: 1;
+}
+
+.empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--color-cream);
+}
+
+.empty p {
+  font-size: 1.25rem;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
+}
+
+.emptyHint {
+  font-size: 0.875rem;
+  opacity: 0.6;
+}
+
+/* ── Back button ────────────────────────────────────────── */
+
+.backButton {
+  position: fixed;
+  bottom: max(1.5rem, env(safe-area-inset-bottom));
+  right: 1.5rem;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--color-stout);
+  border: 2px solid var(--color-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.5rem;
+  color: var(--color-gold);
+  transition: transform var(--transition-fast) ease,
+              background-color var(--transition-fast) ease;
+  z-index: 100;
+}
+
+.backButton:hover {
+  background: rgba(201, 162, 39, 0.2);
+}
+
+.backButton:active {
+  transform: scale(0.95);
+}
+
+/* ── Responsive ─────────────────────────────────────────── */
+
+@media (max-width: 320px) {
+  .barCol {
+    width: 34px;
+  }
+}

@@ -1,16 +1,17 @@
 import { useState, useEffect, useMemo } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { 
-  faBeer, 
-  faClock, 
-  faCalendarDay, 
-  faTrophy, 
-  faCalendar, 
-  faFire, 
-  faBolt, 
-  faChartLine, 
+import {
+  faBeer,
+  faClock,
+  faCalendarDay,
+  faTrophy,
+  faCalendar,
+  faFire,
+  faBolt,
+  faChartLine,
   faGlassCheers,
-  faCakeCandles
+  faCakeCandles,
+  faList
 } from '@fortawesome/free-solid-svg-icons'
 import styles from './UserStats.module.css'
 import { API_ENDPOINT } from '../config'
@@ -18,6 +19,7 @@ import { API_ENDPOINT } from '../config'
 interface UserStatsProps {
   userName: string
   onBack: () => void
+  onHistory: () => void
 }
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
@@ -157,7 +159,7 @@ function calculateStats(timestamps: string[]): Stats {
   }
 }
 
-function UserStats({ userName, onBack }: UserStatsProps) {
+function UserStats({ userName, onBack, onHistory }: UserStatsProps) {
   const [timestamps, setTimestamps] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -295,6 +297,12 @@ function UserStats({ userName, onBack }: UserStatsProps) {
               <span className={styles.statDetail}>the one that started it all</span>
             </div>
           )}
+
+          <button className={`${styles.statCard} ${styles.historyCard}`} onClick={onHistory}>
+            <span className={styles.statIcon}><FontAwesomeIcon icon={faList} /></span>
+            <span className={styles.statValue}>History</span>
+            <span className={styles.statLabel}>Monthly chart &amp; daily log</span>
+          </button>
         </div>
       )}
 

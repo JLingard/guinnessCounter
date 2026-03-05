@@ -3,11 +3,12 @@ import NameEntry from './components/NameEntry'
 import CounterButton from './components/CounterButton'
 import Leaderboard from './components/Leaderboard'
 import UserStats from './components/UserStats'
+import HistorySummary from './components/HistorySummary'
 import RulesModal from './components/RulesModal'
 
 const STORAGE_KEY = 'tap-counter-user-name'
 
-type Screen = 'counter' | 'leaderboard' | 'stats'
+type Screen = 'counter' | 'leaderboard' | 'stats' | 'history'
 
 function App() {
   const [userName, setUserName] = useState<string | null>(null)
@@ -45,9 +46,19 @@ function App() {
 
   if (currentScreen === 'stats') {
     return (
-      <UserStats 
+      <UserStats
         userName={userName}
-        onBack={() => setCurrentScreen('counter')} 
+        onBack={() => setCurrentScreen('counter')}
+        onHistory={() => setCurrentScreen('history')}
+      />
+    )
+  }
+
+  if (currentScreen === 'history') {
+    return (
+      <HistorySummary
+        userName={userName}
+        onBack={() => setCurrentScreen('stats')}
       />
     )
   }
