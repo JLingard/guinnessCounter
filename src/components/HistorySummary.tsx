@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBeer } from '@fortawesome/free-solid-svg-icons'
+import { faBeer, faChartLine } from '@fortawesome/free-solid-svg-icons'
 import styles from './HistorySummary.module.css'
 import { API_ENDPOINT } from '../config'
 
@@ -131,7 +131,7 @@ function HistorySummary({ userName, onBack }: HistorySummaryProps) {
       <div className={styles.container}>
         <div className={styles.loading}>Loading your history...</div>
         <button className={styles.backButton} onClick={onBack} aria-label="Back to stats">
-          <FontAwesomeIcon icon={faBeer} />
+          <FontAwesomeIcon icon={faChartLine} />
         </button>
       </div>
     )
@@ -142,7 +142,7 @@ function HistorySummary({ userName, onBack }: HistorySummaryProps) {
       <div className={styles.container}>
         <div className={styles.error}>{error}</div>
         <button className={styles.backButton} onClick={onBack} aria-label="Back to stats">
-          <FontAwesomeIcon icon={faBeer} />
+          <FontAwesomeIcon icon={faChartLine} />
         </button>
       </div>
     )
@@ -157,7 +157,7 @@ function HistorySummary({ userName, onBack }: HistorySummaryProps) {
           <p className={styles.emptyHint}>Tap that pint to get started</p>
         </div>
         <button className={styles.backButton} onClick={onBack} aria-label="Back to stats">
-          <FontAwesomeIcon icon={faBeer} />
+          <FontAwesomeIcon icon={faChartLine} />
         </button>
       </div>
     )
