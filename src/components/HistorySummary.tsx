@@ -11,8 +11,24 @@ interface HistorySummaryProps {
 
 const MONTH_ABBR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
-function formatDayLabel(dateStr: string): string {
-  const date = new Date(dateStr)
+// Use local date parts throughout to avoid UTC-vs-local timezone mismatches
+function localMonthKey(date: Date): string {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  return `${y}-${m}`
+}
+
+function localDateKey(date: Date): string {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
+}
+
+function formatDayLabel(dateKey: string): string {
+  // Construct with explicit parts to avoid UTC-offset shifts
+  const [year, month, day] = dateKey.split('-').map(Number)
+  const date = new Date(year, month - 1, day)
   return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
@@ -32,23 +48,19 @@ interface DayEntry {
 function processData(timestamps: string[]): { months: MonthBar[]; days: DayEntry[] } {
   if (timestamps.length === 0) return { months: [], days: [] }
 
-  const currentMonthKey = new Date().toISOString().slice(0, 7) // YYYY-MM
+  const currentMonthKey = localMonthKey(new Date())
 
-  // Group by month (YYYY-MM)
   const monthCounts: Record<string, number> = {}
-  // Group by day (YYYY-MM-DD)
   const dayCounts: Record<string, number> = {}
 
   timestamps.forEach(ts => {
     const date = new Date(ts)
-    const monthKey = ts.slice(0, 7) // YYYY-MM
-    const dayKey = date.toISOString().split('T')[0] // YYYY-MM-DD
-
-    monthCounts[monthKey] = (monthCounts[monthKey] || 0) + 1
-    dayCounts[dayKey] = (dayCounts[dayKey] || 0) + 1
+    const mKey = localMonthKey(date)
+    const dKey = localDateKey(date)
+    monthCounts[mKey] = (monthCounts[mKey] || 0) + 1
+    dayCounts[dKey] = (dayCounts[dKey] || 0) + 1
   })
 
-  // Sort months ascending
   const months: MonthBar[] = Object.entries(monthCounts)
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([key, count]) => {
@@ -57,7 +69,6 @@ function processData(timestamps: string[]): { months: MonthBar[]; days: DayEntry
       return { key, label, count, isCurrent: key === currentMonthKey }
     })
 
-  // Sort days descending (newest first)
   const days: DayEntry[] = Object.entries(dayCounts)
     .sort(([a], [b]) => b.localeCompare(a))
     .map(([dateKey, count]) => ({
@@ -69,26 +80,41 @@ function processData(timestamps: string[]): { months: MonthBar[]; days: DayEntry
   return { months, days }
 }
 
+const MIN_BAR_HEIGHT_PX = 14
+const MAX_BAR_HEIGHT_PX = 140
+// Only hint at scroll when there are enough bars to overflow a typical mobile screen
+const SCROLL_THRESHOLD = 4
+
 function HistorySummary({ userName, onBack }: HistorySummaryProps) {
   const [timestamps, setTimestamps] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    const controller = new AbortController()
+
     const fetchData = async () => {
       try {
         const response = await fetch(
-          `${API_ENDPOINT}?action=getUserTimestamps&name=${encodeURIComponent(userName)}`
+          `${API_ENDPOINT}?action=getUserTimestamps&name=${encodeURIComponent(userName)}`,
+          { signal: controller.signal }
         )
+        if (!response.ok) throw new Error(`HTTP ${response.status}`)
         const data = await response.json()
         setTimestamps(data.timestamps ?? [])
-      } catch {
-        setError('Failed to load your history')
+      } catch (err) {
+        if ((err as Error).name !== 'AbortError') {
+          setError('Failed to load your history')
+        }
       } finally {
-        setIsLoading(false)
+        if (!controller.signal.aborted) {
+          setIsLoading(false)
+        }
       }
     }
+
     fetchData()
+    return () => controller.abort()
   }, [userName])
 
   const { months, days } = useMemo(() => processData(timestamps), [timestamps])
@@ -97,6 +123,8 @@ function HistorySummary({ userName, onBack }: HistorySummaryProps) {
     () => months.reduce((max, m) => Math.max(max, m.count), 0),
     [months]
   )
+
+  const isScrollable = months.length > SCROLL_THRESHOLD
 
   if (isLoading) {
     return (
@@ -143,12 +171,16 @@ function HistorySummary({ userName, onBack }: HistorySummaryProps) {
       {/* Monthly bar chart */}
       <div className={styles.section}>
         <p className={styles.sectionTitle}>By Month</p>
-        <div className={styles.chartWrapper}>
+        <div
+          className={`${styles.chartWrapper} ${isScrollable ? styles.chartWrapperScrollable : ''}`}
+          role="img"
+          aria-label={`Monthly pints chart: ${months.map(m => `${m.label} ${m.count} pint${m.count !== 1 ? 's' : ''}`).join(', ')}`}
+        >
           <div className={styles.chart}>
             {months.map(m => {
               const heightPx = maxMonthCount > 0
-                ? Math.max(4, Math.round((m.count / maxMonthCount) * 140))
-                : 4
+                ? Math.max(MIN_BAR_HEIGHT_PX, Math.round((m.count / maxMonthCount) * MAX_BAR_HEIGHT_PX))
+                : MIN_BAR_HEIGHT_PX
               return (
                 <div key={m.key} className={styles.barCol}>
                   <span className={styles.barCount}>{m.count}</span>
